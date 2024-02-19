@@ -1,0 +1,27 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+embassy-stm32 = {version = "0.1.0", features = [
+    "stm32g0b0re",
+    "memory-x", # generate memory layout automatically
+    "time", "time-driver-any",
+    "unstable-pac",
+]}
+embassy-executor = {version = "0.5.0", features = [
+    "arch-cortex-m",
+    "executor-thread",
+    "integrated-timers",
+]}
+embassy-time = "0.3.0"
+
+cortex-m = {version = "0.7.7", features = ["inline-asm", "critical-section-single-core"]}
+cortex-m-rt = "0.7.3"
+embedded-hal = "1.0.0"
+futures = {version = "0.3.30", default-features = false, features = ["async-await"]}
+portable-atomic = {version = "1.6.0", features = ["unsafe-assume-single-core"]}
+panic-probe = "0.3.1"
