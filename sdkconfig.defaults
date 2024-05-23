@@ -1,0 +1,23 @@
+
+
+# we use the ESP32-S3-MINI-1U-N8 module
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESPTOOLPY_FLASH_MODE_AUTO_DETECT=n
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+
+# run at the fastest rated clock speed
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+
+# log only to the USB debug port - this frees up GPIO43 and GPIO44
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# log as little as possible from the bootloader
+# this reduces the cold boot time by ~120 ms
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+
+# don't validate the application image on cold boot
+# this reduces the cold boot time by ~35 ms
+CONFIG_BOOTLOADER_SKIP_VALIDATE_IN_DEEP_SLEEP=y
+CONFIG_BOOTLOADER_SKIP_VALIDATE_ON_POWER_ON=y

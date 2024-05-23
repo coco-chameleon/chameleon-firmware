@@ -1,0 +1,9 @@
+
+# build outputs
+/build/
+/cmake-build-*/
+
+# we use the sdkconfig.defaults mechanism
+/sdkconfig
+/sdkconfig.*
+!/sdkconfig.defaults
