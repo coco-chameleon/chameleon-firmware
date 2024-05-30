@@ -1,0 +1,5 @@
+# SPDX-FileCopyrightText: 2024 Sam Hanes <sam@maltera.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+/build/
+/cmake-build-*/
