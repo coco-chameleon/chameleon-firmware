@@ -6,6 +6,7 @@
 
 #include <esp_err.h>
 
+#define CC_GPIO_CLK     2
 
 #define CC_GPIO_BUF_ADDR_HIGH   46
 #define CC_GPIO_BUF_ADDR_LOW    45

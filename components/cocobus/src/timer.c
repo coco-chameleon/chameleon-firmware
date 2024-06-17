@@ -4,6 +4,9 @@
 #include <driver/mcpwm_prelude.h>
 #include <esp_check.h>
 #include <esp_err.h>
+#include <esp_intr_alloc.h>
+#include <soc/soc.h>
+#include <soc/mcpwm_periph.h>
 
 #include "internal.h"
 
@@ -26,6 +29,7 @@ struct cocobus_timer {
     struct cocobus_timer_segment addr_low;
     struct cocobus_timer_segment data;
     mcpwm_gen_handle_t data_gen_dir;
+    intr_handle_t intr;
 };
 
 struct cocobus_timer timer;
@@ -126,9 +130,9 @@ esp_err_t cocobus_timer_init(void)
 
     mcpwm_timer_config_t timer_config = {
         .group_id = CC_MCPWM_GROUP,
-        .resolution_hz = 120000000, // 8.33 ns, 2 instructions
         .count_mode = MCPWM_TIMER_COUNT_MODE_UP,
-        .period_ticks = 150, // 1250 ns
+        .resolution_hz = 80000000, // 12.5 ns, 3 instructions
+        .period_ticks = 12500, // 1 ms watchdog for host clock loss
         .flags = {
             .update_period_on_sync = true,
         },
@@ -139,9 +143,9 @@ esp_err_t cocobus_timer_init(void)
 
     mcpwm_gpio_sync_src_config_t gpio_sync_config = {
         .group_id = CC_MCPWM_GROUP,
-        .gpio_num = 2,
+        .gpio_num = CC_GPIO_CLK,
         .flags = {
-            .active_neg = 1,
+            .active_neg = 0,
         },
     };
 
@@ -203,6 +207,17 @@ esp_err_t cocobus_timer_init(void)
     result = mcpwm_timer_enable(timer.timer);
     ESP_RETURN_ON_ERROR(result, TAG, "failed to enable timer");
 
-    ESP_LOGI(TAG, "cocobus_init complete");
+
+    result = esp_intr_alloc(
+        mcpwm_periph_signals.groups[CC_MCPWM_GROUP].irq_id,
+        ESP_INTR_FLAG_NMI | ESP_INTR_FLAG_IRAM,
+        NULL, // xt_nmi defined in interrupt.S
+        NULL,
+        &timer.intr
+    );
+    ESP_RETURN_ON_ERROR(result, TAG, "failed to allocate interrupt");
+
+
+    ESP_LOGI(TAG, "cocobus_timer_init complete");
     return ESP_OK;
 }
