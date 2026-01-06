@@ -1,12 +1,21 @@
 [package]
 edition      = "2024"
-name         = "chameleon-firmware-rs"
+name         = "chameleon-firmware"
 rust-version = "1.88"
 version      = "0.1.0"
 
+[lib]
+test = false
+bench = false
+doctest = false
+
 [[bin]]
-name = "chameleon-firmware-rs"
+name = "chameleon-firmware"
 path = "./src/bin/main.rs"
+
+test = false
+bench = false
+doctest = false
 
 [dependencies]
 esp-hal = { version = "~1.0", features = ["defmt", "esp32s3", "unstable"] }
