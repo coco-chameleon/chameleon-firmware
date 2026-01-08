@@ -3,6 +3,8 @@ runner = "probe-rs run --chip=esp32s3 --preverify --always-print-stacktrace --no
 
 [env]
 DEFMT_LOG="info"
+WIFI_SSID=""
+WIFI_PSK=""
 
 [build]
 rustflags = [
