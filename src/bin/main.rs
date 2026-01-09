@@ -15,6 +15,7 @@ use esp_hal::clock::CpuClock;
 use esp_hal::timer::timg::TimerGroup;
 use esp_radio::ble::controller::BleConnector;
 use trouble_host::prelude::*;
+use chameleon_firmware::led::LedController;
 
 extern crate alloc;
 extern crate esp_backtrace;
@@ -40,7 +41,7 @@ esp_bootloader_esp_idf::esp_app_desc!();
     reason = "it's not unusual to allocate larger buffers etc. in main"
 )]
 #[esp_rtos::main]
-async fn main(spawner: Spawner) -> ! {
+async fn main(spawner: Spawner) {
     rtt_target::rtt_init_defmt!();
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
@@ -54,6 +55,8 @@ async fn main(spawner: Spawner) -> ! {
     esp_rtos::start(timg0.timer0);
 
     info!("Embassy initialized!");
+
+    let mut led = LedController::new(peripherals.GPIO5, peripherals.RMT);
 
     let radio_controller = &*mk_static!(
         esp_radio::Controller<'static>,
@@ -74,10 +77,7 @@ async fn main(spawner: Spawner) -> ! {
     let _stack = trouble_host::new(ble_controller, &mut resources);
 
 
-    loop {
-        info!("Hello world!");
-        Timer::after(Duration::from_secs(1)).await;
-    }
-
-    // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v~1.0/examples
+    led.animate(&[0x32808000, 0x32008008]);
+    Timer::after(Duration::from_secs(15)).await;
+    led.solid(0x800080);
 }
