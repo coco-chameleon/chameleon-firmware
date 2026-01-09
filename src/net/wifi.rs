@@ -31,7 +31,7 @@ pub async fn new(
 
     let rng = Rng::new();
 
-    let (net_stack, net_runner) = embassy_net::new(
+    let (_net_stack, net_runner) = embassy_net::new(
         wifi_interfaces.sta,
         dhcp_config,
         mk_static!(StackResources<3>, StackResources::<3>::new()),
