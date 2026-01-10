@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Sam Hanes <sam@maltera.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #![no_std]
 #![no_main]
 #![deny(
@@ -16,7 +19,7 @@ use esp_hal::clock::CpuClock;
 use esp_hal::timer::timg::TimerGroup;
 use esp_radio::ble::controller::BleConnector;
 use trouble_host::prelude::*;
-use chameleon_firmware::led::LedController;
+use chameleon::led::LedController;
 
 extern crate alloc;
 extern crate esp_backtrace;
@@ -68,7 +71,7 @@ async fn main(spawner: Spawner) {
         esp_radio::init().expect("Failed to initialize Wi-Fi/BLE controller")
     );
 
-    chameleon_firmware::net::wifi::new(
+    chameleon::net::wifi::new(
         spawner,
         peripherals.WIFI,
         radio_controller,

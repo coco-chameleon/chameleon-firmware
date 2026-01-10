@@ -1,8 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Sam Hanes <sam@maltera.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [package]
-edition      = "2024"
-name         = "chameleon-firmware"
-rust-version = "1.88"
+name         = "chameleon"
 version      = "0.1.0"
+edition      = "2024"
+rust-version = "1.88"
 
 [lib]
 test = false
@@ -10,9 +13,8 @@ bench = false
 doctest = false
 
 [[bin]]
-name = "chameleon-firmware"
+name = "main"
 path = "./src/bin/main.rs"
-
 test = false
 bench = false
 doctest = false

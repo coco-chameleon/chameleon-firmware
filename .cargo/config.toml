@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Sam Hanes <sam@maltera.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [target.xtensa-esp32s3-none-elf]
 runner = "probe-rs run --chip=esp32s3 --preverify --always-print-stacktrace --no-location --catch-hardfault"
 
