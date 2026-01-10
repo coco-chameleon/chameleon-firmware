@@ -10,7 +10,8 @@
 use bt_hci::controller::ExternalController;
 use defmt::{info};
 use embassy_executor::Spawner;
-use embassy_time::{Duration, Timer};
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
+use embassy_sync::mutex::Mutex;
 use esp_hal::clock::CpuClock;
 use esp_hal::timer::timg::TimerGroup;
 use esp_radio::ble::controller::BleConnector;
@@ -56,7 +57,11 @@ async fn main(spawner: Spawner) {
 
     info!("Embassy initialized!");
 
-    let mut led = LedController::new(peripherals.GPIO5, peripherals.RMT);
+    let _led = mk_static!(
+        Mutex<CriticalSectionRawMutex, LedController<'static>>,
+        Mutex::new(LedController::new(peripherals.GPIO5, peripherals.RMT))
+    );
+
 
     let radio_controller = &*mk_static!(
         esp_radio::Controller<'static>,
@@ -75,9 +80,4 @@ async fn main(spawner: Spawner) {
     let mut resources: HostResources<DefaultPacketPool, CONNECTIONS_MAX, L2CAP_CHANNELS_MAX> =
         HostResources::new();
     let _stack = trouble_host::new(ble_controller, &mut resources);
-
-
-    led.animate(&[0x32808000, 0x32008008]);
-    Timer::after(Duration::from_secs(15)).await;
-    led.solid(0x800080);
 }
