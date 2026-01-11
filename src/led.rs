@@ -42,13 +42,11 @@
 // transmission to finish before starting the next, so we drive the RMT
 // peripheral directly at the register level.
 
-
 use core::f32::math::round;
 use esp_hal::gpio;
 use esp_hal::gpio::Level;
 use esp_hal::peripherals::{RMT, SYSTEM};
 use esp_hal::rmt::PulseCode;
-
 
 /// A color value which can be displayed by the LED.
 ///
@@ -102,7 +100,9 @@ impl Color {
 
 impl From<Color> for u32 {
     #[inline]
-    fn from(color: Color) -> Self { color.0 }
+    fn from(color: Color) -> Self {
+        color.0
+    }
 }
 
 impl defmt::Format for Color {
@@ -115,7 +115,6 @@ impl defmt::Format for Color {
         );
     }
 }
-
 
 /// A frame of an LED animation, consisting of a color and a duration.
 ///
@@ -156,20 +155,16 @@ impl Frame {
 
 impl From<Frame> for u32 {
     #[inline]
-    fn from(frame: Frame) -> Self { frame.0 }
+    fn from(frame: Frame) -> Self {
+        frame.0
+    }
 }
 
 impl defmt::Format for Frame {
     fn format(&self, fmt: defmt::Formatter) {
-        defmt::write!(
-            fmt,
-            "{}/{}ms",
-            self.color(),
-            self.duration_ms(),
-        )
+        defmt::write!(fmt, "{}/{}ms", self.color(), self.duration_ms())
     }
 }
-
 
 /// Controls the RGB LED using the RMT peripheral.
 ///
@@ -188,7 +183,8 @@ impl Drop for LedController<'_> {
         self.pin.set_output_enable(false);
         gpio::OutputSignal::RMT_SIG_0.disconnect_from(&self.pin);
 
-        SYSTEM::regs().perip_clk_en0()
+        SYSTEM::regs()
+            .perip_clk_en0()
             .modify(|_, w| w.rmt_clk_en().clear_bit());
     }
 }
@@ -196,15 +192,14 @@ impl Drop for LedController<'_> {
 impl<'d> LedController<'d> {
     pub fn new<'a>(
         gpio: impl gpio::interconnect::PeripheralOutput<'d>,
-        _rmt: RMT<'d>
+        _rmt: RMT<'d>,
     ) -> Self {
         let pin: gpio::interconnect::OutputSignal = gpio.into();
         gpio::OutputSignal::RMT_SIG_0.connect_to(&pin);
         pin.apply_output_config(&gpio::OutputConfig::default());
         pin.set_output_enable(true);
 
-        SYSTEM::regs().perip_clk_en0()
-            .modify(|_, w| w.rmt_clk_en().set_bit());
+        SYSTEM::regs().perip_clk_en0().modify(|_, w| w.rmt_clk_en().set_bit());
 
         let reg = RMT::regs();
 
@@ -232,8 +227,7 @@ impl<'d> LedController<'d> {
 
     #[inline]
     fn write(&self, value: PulseCode) {
-        RMT::regs().ch0data()
-            .write(|w| unsafe { w.bits(value.into()) });
+        RMT::regs().ch0data().write(|w| unsafe { w.bits(value.into()) });
     }
 
     fn encode(&self, color: u32) {
@@ -244,15 +238,17 @@ impl<'d> LedController<'d> {
             } else {
                 self.write(PulseCode::new(Level::High, 2, Level::Low, 5));
             }
-            value = value << 1;
+            value <<= 1;
         }
     }
 
     fn delay(&self, ticks: u32) {
         for _ in 0..ticks {
             self.write(PulseCode::new(
-                Level::Low, PulseCode::MAX_LEN,
-                Level::Low, PulseCode::MAX_LEN,
+                Level::Low,
+                PulseCode::MAX_LEN,
+                Level::Low,
+                PulseCode::MAX_LEN,
             ));
         }
     }

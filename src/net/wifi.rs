@@ -6,11 +6,15 @@ use embassy_executor::Spawner;
 use embassy_net::{Runner, StackResources};
 use embassy_time::{Duration, Timer};
 use esp_hal::rng::Rng;
-use esp_radio::wifi::{ClientConfig, ModeConfig, ScanConfig, WifiController, WifiDevice, WifiEvent, WifiStaState};
+use esp_radio::wifi::{
+    ClientConfig, ModeConfig, ScanConfig, WifiController, WifiDevice,
+    WifiEvent, WifiStaState,
+};
 
 macro_rules! mk_static {
     ($t:ty,$val:expr) => {{
-        static STATIC_CELL: static_cell::StaticCell<$t> = static_cell::StaticCell::new();
+        static STATIC_CELL: static_cell::StaticCell<$t> =
+            static_cell::StaticCell::new();
         #[deny(unused_attributes)]
         let x = STATIC_CELL.uninit().write(($val));
         x
@@ -20,14 +24,13 @@ macro_rules! mk_static {
 const WIFI_SSID: &str = env!("WIFI_SSID");
 const WIFI_PSK: &str = env!("WIFI_PSK");
 
-
 pub async fn new(
     spawner: Spawner,
     device: esp_hal::peripherals::WIFI<'static>,
     radio_controller: &'static esp_radio::Controller<'static>,
 ) {
     let (wifi_controller, wifi_interfaces) =
-        esp_radio::wifi::new(&radio_controller, device, Default::default())
+        esp_radio::wifi::new(radio_controller, device, Default::default())
             .expect("Failed to initialize Wi-Fi controller");
 
     let dhcp_config = embassy_net::Config::dhcpv4(Default::default());
@@ -50,9 +53,7 @@ async fn wifi_connection_task(mut controller: WifiController<'static>) {
     loop {
         if esp_radio::wifi::sta_state() == WifiStaState::Connected {
             // wait until we're no longer connected
-            controller
-                .wait_for_event(WifiEvent::StaDisconnected)
-                .await;
+            controller.wait_for_event(WifiEvent::StaDisconnected).await;
             Timer::after(Duration::from_millis(5000)).await
         }
         if !matches!(controller.is_started(), Ok(true)) {
@@ -68,10 +69,8 @@ async fn wifi_connection_task(mut controller: WifiController<'static>) {
 
             info!("Scan");
             let scan_config = ScanConfig::default();
-            let result = controller
-                .scan_with_config_async(scan_config)
-                .await
-                .unwrap();
+            let result =
+                controller.scan_with_config_async(scan_config).await.unwrap();
             for ap in result {
                 info!("{:?}", ap);
             }
